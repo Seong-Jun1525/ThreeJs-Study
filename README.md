@@ -64,3 +64,106 @@ window.addEventListener('resize', () => {
 
 renderer.render(scene, camera)
 ```
+
+### antialias
+**적용전**
+
+<img src="./readmeImg/antialias적용전.png">
+
+```js
+const renderer = new THREE.WebGLRenderer()
+```
+
+**적용후**
+
+<img src="./readmeImg/antialias적용후.png">
+
+```js
+const renderer = new THREE.WebGLRenderer({antialias: true})
+```
+
+### MeshBasicMaterial MeshStandardMaterial
+**MeshBasicMaterial**
+```js
+const material = new THREE.MeshBasicMaterial({color: 0xff0000})
+```
+
+**MeshStandardMaterial**
+```js
+const directionalLight = new THREE.DirectionalLight(0xffffff, 5) // 색, 색의 세기
+directionalLight.castShadow = true
+directionalLight.position.set(3,4,5)
+directionalLight.lookAt(0, 0, 0)
+scene.add(directionalLight)
+
+const material = new THREE.MeshStandardMaterial({color: 0xff0000})
+// MeshBasicMaterial이 아닌 Material은 빛의 영향을 받는다
+```
+
+### OrbitControls
+```js
+const orbitControls = new OrbitControls(camera, renderer.domElement)
+orbitControls.update()
+// orbitControls가 정상적으로 동작하기 위해 requestAnimation 프레임사용
+
+// render 함수 수정
+const render = () => {
+    renderer.render(scene, camera)
+    requestAnimationFrame(render)
+}
+
+render()
+```
+
+## floor 추가
+```js
+const floorGeometry = new THREE.PlaneGeometry(20, 20)
+const floorMaterial = new THREE.MeshStandardMaterial({color: 0xbbbbbb})
+const floor = new THREE.Mesh(floorGeometry, floorMaterial)
+scene.add(floor)
+```
+
+<img src="./readmeImg/floor.png">
+
+
+## PlaneGeometry CapsuleGeometry 추가
+```js
+// PlaneGeometry 생성
+const floorGeometry = new THREE.PlaneGeometry(20, 20)
+const floorMaterial = new THREE.MeshStandardMaterial({color: 0xbbbbbb})
+const floor = new THREE.Mesh(floorGeometry, floorMaterial)
+floor.rotation.x = -Math.PI / 2 //  PI는 180°. 즉, 총 -90°만큼 회전
+floor.receiveShadow = true // 그림자를 받을 수 있게 해줌
+floor.castShadow = true
+scene.add(floor)
+
+// CapsuleGeometry 생성
+const capsuleGeometry = new THREE.CapsuleGeometry(1, 2, 20, 30)
+const capsuleMaterial = new THREE.MeshStandardMaterial({color: 0xffff00})
+const capsuleMesh = new THREE.Mesh(capsuleGeometry, capsuleMaterial)
+capsuleMesh.position.set(3, 1.75, 0)
+capsuleMesh.receiveShadow = true
+capsuleMesh.castShadow = true
+scene.add(capsuleMesh)
+```
+
+<img src="./readmeImg/PlaneGeometry-CapsuleGeometry생성.png">
+
+### 박혀있는 거 같은 mesh 수정
+```js
+mesh.castShadow = true
+mesh.position.y = 0.5
+scene.add(mesh)
+```
+
+<img src="./readmeImg/mesh수정.png">
+
+### 그림자가 나오지 않는 부분 수정
+```js
+const renderer = new THREE.WebGLRenderer({antialias: true})
+renderer.shadowMap.enabled = true // 추가
+renderer.setSize(window.innerWidth, window.innerHeight)
+document.body.appendChild(renderer.domElement)
+```
+
+<img src="./readmeImg/실습1 완성본.png">
